@@ -84,6 +84,8 @@ I would recommend that AT&T use the large opening size and a thick solder size t
 
 # Problem 2
 
+### Part A
+
 ```{r echo = FALSE, warning = FALSE}
 groceries <- read.csv("groceries.csv")
 groceries %>%
@@ -100,6 +102,8 @@ groceries %>%
 ```
 
 The bar graph above illustrates how the average product price varies by store. Whole Foods has the highest average product price while Fiesta has the lowest average product price.
+
+### Part B
 
 ```{r echo = FALSE, warning = FALSE}
 groceries %>%
@@ -129,7 +133,7 @@ price_type_reg_table <- get_regression_table(lm_price, conf.level = 0.95, digits
 # -0.92 -0.41
 ```
 
-Compared with ordinary grocery stores (like Albertsons, HEB, or Krogers), convenience stores charge somewhere between -0.92 and -0.41 dollars more for the same product.
+Compared with ordinary grocery stores (like Albertsons, HEB, or Krogers), convenience stores charge somewhere between 0.41 and 0.92 dollars more for the same product.
 
 ### Part D
 
