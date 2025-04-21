@@ -1,0 +1,189 @@
+---
+title: "Homework 9"
+author: "Advik Ravichandran"
+date: "April 21th, 2025"
+output:
+  pdf_document:
+    toc: false
+    toc_depth: '3'
+  html_document:
+    toc: false
+    toc_float: false
+    toc_depth: 3
+    number_sections: false
+    theme: journal
+---
+
+**UTEID:** asr3897
+
+**GitHub Link:** <https://github.com/advikr/SDS315-HW-9>
+
+# Problem 1
+
+```{r echo = FALSE, warning = FALSE, results = 'hide', message = FALSE}
+# Importing libraries
+library(tidyverse)
+library(ggplot2)
+library(mosaic)
+library(moderndive)
+library(knitr)
+library(effectsize)
+```
+
+### Part A
+
+```{r echo = FALSE, warning = FALSE}
+solder <- read.csv("solder.csv")
+
+ggplot(solder) + geom_boxplot(aes(x = Opening, y = skips)) + 
+  labs(
+    x = "Opening Size", 
+    y = "Number of Solder Skips",
+    title = "Solder Skips by Solder Gun 
+    Opening Size"
+  )
+```
+
+This box plot illustrates how the number of skips on the board vary by the size of the solder gun opening. It shows that, on average, the smaller the opening size, the higher number of solder skips.
+
+```{r echo = FALSE, warning = FALSE}
+ggplot(solder) + geom_boxplot(aes(x = Solder, y = skips)) +
+  labs(
+    x = "Solder Alloy Thickness",
+    y = "Number of Solder Skips",
+    title = "Solder Skips by Solder Alloy Thickness"
+  )
+```
+
+This boxplot shows how the number of solder skips vary by the alloy thickness. On average, the thinner the solder alloy thickness is the higher the number of solder skips.
+
+### Part B
+
+```{r echo = FALSE, warning = FALSE}
+lm_solder = lm(skips ~ Opening * Solder, data = solder)
+get_regression_table(lm_solder, conf.level = 0.95, digits=3)
+```
+
+### Part C
+
+**Intercept:** The baseline number of skips for when the opening size is large and the solder thickness is thick is 0.393 skips.
+
+**Opening M:** The main effect for the Opening M variable is 2.407 skips, which is the estimated increase in the average number of skips when using the medium opening instead of large using the thick solder.
+
+**Opening S:** The main effect for the Opening S variable is 5.127 skips, which is the estimated increase in the average number of skips when using the small opening instead of large using the thick solder.
+
+**Solder Thin:** The main effect for the Solder Thin variable is 2.280 skips, which the estimated increase in the average number of skips when using the thin solder thickness instead of thick.
+
+**Opening M Solder Thin:** The main effect for the Opening M Solder Thin variable is -0.740 skips, indicating that using a medium size opening and and a thin solder thickness will decrease the average number of skips by 0.74.
+
+**Opening S Solder Thin:** The main effect for the Opening M Solder Thin variable is 9.653 skips, indicating that using a small size opening and and a thin solder thickness will increase the average number of skips by 9.653.
+
+### Part D
+
+I would recommend that AT&T use the large opening size and a thick solder size to minimize the number of skips. This is because when running a linear regression analysis, this combination had the least amount of skips when compared to the others.
+
+# Problem 2
+
+```{r echo = FALSE, warning = FALSE}
+groceries <- read.csv("groceries.csv")
+groceries %>%
+  group_by(Store) %>%
+  summarize(avg_price = mean(Price)) %>%
+  ggplot(aes(x = reorder(Store, avg_price), y = avg_price)) +
+  geom_col(fill = "green") + 
+  coord_flip() +
+  labs(
+    y = "Average Product Price in Dollars",
+    x = "Store",
+    title = "Average Product Price Grouped by Store"
+  )
+```
+
+The bar graph above illustrates how the average product price varies by store. Whole Foods has the highest average product price while Fiesta has the lowest average product price.
+
+```{r echo = FALSE, warning = FALSE}
+groceries %>%
+  group_by(Product) %>%
+  summarize(num_stores_selling = n_distinct(Store)) %>%
+  arrange(desc(num_stores_selling)) %>%
+  ggplot(aes(x = reorder(Product, num_stores_selling), y = num_stores_selling)) + 
+  geom_col(fill = "green") + 
+  coord_flip() +
+  theme(axis.text.y = element_text(size = 6)) + 
+  labs(
+    y = "Number of Stores Selling",
+    x = "Product",
+    title = "Number of Stores Selling a Certain Product"
+  )
+```
+
+This bar graph illustrates how many stores are selling a certain product. The most stores, 16, is selling Iodizes Salt, Horizon 2% Milk Carton, and a carton of eggs while the least stores are selling Lucky Charms 1lb, Frosted Flakes 1lb, El Milagros Tortilla Chips, and Cinnamon Toast Crunch 1lb.
+
+### Part C
+
+```{r echo = FALSE, warning = FALSE}
+lm_price <- lm(Price ~ Product + Type, data = groceries)
+price_type_reg_table <- get_regression_table(lm_price, conf.level = 0.95, digits=2)
+# -0.66 0.13 -5.20 0.00 
+# Confidence Intervals
+# -0.92 -0.41
+```
+
+Compared with ordinary grocery stores (like Albertsons, HEB, or Krogers), convenience stores charge somewhere between -0.92 and -0.41 dollars more for the same product.
+
+### Part D
+
+```{r echo = FALSE, warning = FALSE}
+lm_price_product <- lm(Price ~ Product + Store, data = groceries)
+price_type_reg_table <- get_regression_table(lm_price_product, conf.level = 0.95, digits = 2)
+# Wheatsville Food Co Op(0.29)
+# Whole Foods(0.36)
+
+# Kroger Fresh Fare(-.90)
+# Walmart(-.99)
+lm_price_product
+```
+
+The two stores that charge the highest prices when comparing the same product is Whole Foods, 0.36 dollars, and Wheatsville Food Co Op, 0.29 dollars. The two stores that charge the lowest prices when comparing the same product is Walmart, -0.99 dollars, and Kroger Fresh Fare, -0.90.
+
+### Part E
+
+H-E-B has a coefficient of -0.65 while Central Market has a coefficient of -0.57. This indicates that, on average, H-E-B charges 8 cents less for their products than Central Market. Although there is a change, it is considered minimal when looking at how it would impact the real world.
+
+### Part F
+
+```{r echo = FALSE, warning = FALSE}
+groceries <- groceries %>%
+  mutate(Income10K = Income/10000)
+
+lm_income <- lm(Price ~ Product + Income10K, data = groceries)
+
+get_regression_table(lm_income, conf.level = 0.95, digits = 2) %>%
+  filter(term == "Income10K") %>%
+  kable()
+standardize_parameters(lm_income)
+```
+
+Consumers in poorer zip codes tend to pay more than richer zip codes for the same product. The coefficient estimate is -0.01, which means that while the zip code income increases, prices decrease by one cent. A one-standard deviation increase in the income of a ZIP code seems to be associated with a -0.03 standard-deviation change in the price that consumers in that ZIP code expect to pay for the same product.
+
+# Problem 3
+
+### A:
+
+This statement is true because the confidence interval of the minority percentage in Figure A1 does not include 0 (0.009, 0.018). Also, the r-squared value is 0.52, which means that 52% of the variation in fair policies can be explained by race. Additionally, the p-value is 0, indicating that it is significant.
+
+### B:
+
+This statement is undecidable because the confidence interval of the relationship between % minority and housing age includes 0 (-0.116, 0.912), meaning that the relationship is not statistically significant. Also, there is no data indicating that there is an interaction effect between minority percentage and the age of housing stock and the number of FAIR policies in a zip code.
+
+### C:
+
+This statement is false because the confidence interval of the relationship between minority percentage and fire risk group includes 0 (-0.012, 0.01), indicating that this data is not statistically significant. The correct statement should be The relationship between minority percentage and number of FAIR policies per 100 housing units have the same strength in both high-fire-risk ZIP codes and in low-fire-risk ZIP codes.
+
+### D:
+
+This statement is false because the model D1 and D2 show that once income was added as a controlled variable, the minority coefficient changed from 0.014 to 0.01. Since the coefficient is not 0, and the 95% confidence interval does not include 0, this means that Income does not "explain away" all of the association between minority percentage and FAIR policy uptake.
+
+### E:
+
+This statement is true because even while controlling income, fire risk, and housing age, there is still a coefficient value of 0.008, showing that there is an association between minority percentage and the number of FAIR policies.
